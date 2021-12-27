@@ -1,5 +1,6 @@
 #include "Matrix.h"
 #include <iostream>
+#include <assert.h>
 
 //////////////////////////////////  Matrix //////////////////////////////////////////////
 
@@ -35,6 +36,14 @@ Matrix::Matrix(const Matrix& matrix)
 	}
 }
 
+Matrix Matrix::identity(int const size)
+{
+	Matrix I(size, size);
+	for (int row_idx = 0; row_idx < size; row_idx++)
+		I(row_idx, row_idx) = 1;
+	return I;
+}
+
 Matrix& Matrix::operator=(const Matrix& matrix)
 {
 	if (this != &matrix)
@@ -64,18 +73,77 @@ double Matrix::operator()(const int& row_idx, const int& col_idx) const
 	return _data[row_idx][col_idx];
 }
 
+void Matrix::operator-=(const double& lambda)
+{
+	(*this) = (*this) + (-1) * lambda;
+}
+
+Matrix Matrix::operator-(const double& lambda) const
+{
+	return (*this) - lambda;
+}
+
+void Matrix::operator*=(const double& lambda)
+{
+	for (int row_idx = 0; row_idx < _nrows; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < _ncols; col_idx++)
+			_data[col_idx][row_idx] *= lambda;
+	}
+}
+
+Matrix Matrix::operator*(const double& lambda) const
+{
+	Matrix product(*this);
+	product *= lambda;
+	return product;
+}
+
+void Matrix::operator*=(const Matrix& matrix)
+{
+	assert(_nrows == matrix._nrows && _ncols == matrix._ncols);
+	for (int row_idx = 0; row_idx < _nrows; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < _ncols; col_idx++)
+			_data[col_idx][row_idx] *= matrix(row_idx, col_idx);
+	}
+}
+
+Matrix Matrix::operator*(const Matrix& matrix) const
+{
+	Matrix product(*this);
+	product *= matrix;
+	return product;
+}
+
+Matrix Matrix::dot(const Matrix& matrix) const
+{
+	assert(_ncols == matrix._nrows);
+	Matrix product(_nrows, matrix._ncols);
+	double sum = 0;
+	for (int row_idx = 0; row_idx < _nrows; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < matrix._ncols; col_idx++)
+		{
+			sum = 0;
+			for (int col_row_idx = 0; col_row_idx < _ncols; col_row_idx++)
+				sum += _data[row_idx][col_row_idx] * matrix(col_row_idx, col_idx);
+			product(row_idx, col_idx) = sum;
+		}
+	}
+	return product;
+}
+
 Matrix* Matrix::transpose() const
 {
-	Matrix* transpose_ptr = clone();
-	// We ensured that transpose_ptr points to an object of derived type
-
-	transpose_ptr->_nrows = _ncols;
-	transpose_ptr->_ncols = _nrows;
+	Matrix transpose = Matrix(_ncols, _nrows);
 
 	for (int row_idx = 0; row_idx < _nrows; row_idx++)
+	{
 		for (int col_idx = 0; col_idx < _ncols; col_idx++)
-			(*transpose_ptr)(col_idx, row_idx) = (*this)(row_idx, col_idx);
-	return transpose_ptr;
+			transpose(col_idx, row_idx) = (*this)(row_idx, col_idx);
+	}
+	return &transpose;
 }
 
 void Matrix::print_matrix() const
