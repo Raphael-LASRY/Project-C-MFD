@@ -157,3 +157,66 @@ void Matrix::print_matrix() const
 	}
 	std::cout << "\n\n";
 }
+
+void Matrix::set_value(const Matrix& matrix, int& i_ligne, int& j_col, double& val)
+	:_nrows(matrix._nrows), _ncols(matrix._ncols)
+{
+	_data((i_ligne-1)*_ncols+j_col, val);
+}
+
+Matrix Matrix::sum_matrix(const Matrix& matrix1, const Matrix& matrix2)
+{
+	assert(matrix1._nrows == matrix2._nrows && matrix1._ncols == matrix2._ncols);
+	Matrix sum_matrix = Matrix(matrix1._ncols, matrix1._nrows);
+	for (int row_idx = 0; row_idx < matrix1._nrows; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < matrix1._ncols; col_idx++)
+			sum_matrix(row_idx, col_idx) = matrix1(row_idx, col_idx) + matrix2(row_idx, col_idx);
+	}
+	return &sum_matrix;
+}
+
+Matrix Matrix::sum_matrix_real(const Matrix& matrix1, const double val)
+{
+	Matrix sum_mat_real = Matrix(matrix1._ncols, matrix1._nrows);
+	for (int row_idx = 0; row_idx < matrix1._nrows; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < matrix1._ncols; col_idx++)
+			sum_matrix(row_idx, col_idx) = matrix1(row_idx, col_idx) + val;
+	}
+	return &sum_mat_real;
+}
+
+Matrix Matrix::substract_matrix(const Matrix& matrix1, const Matrix& matrix2)
+{
+	assert(matrix1._nrows == matrix2._nrows && matrix1._ncols == matrix2._ncols);
+	Matrix substract_matrix = Matrix(matrix1._ncols, matrix1._nrows);
+	for (int row_idx = 0; row_idx < matrix1._nrows; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < matrix1._ncols; col_idx++)
+			substract_matrix(row_idx, col_idx) = matrix1(row_idx, col_idx) - matrix2(row_idx, col_idx);
+	}
+	return &substract_matrix;
+}
+
+Matrix Matrix::substract_matrix_real(const Matrix& matrix1, const double val)
+{
+	Matrix substract_matrix_real = Matrix(matrix1._ncols, matrix1._nrows);
+	for (int row_idx = 0; row_idx < matrix1._nrows; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < matrix1._ncols; col_idx++)
+			substract_matrix_real(row_idx, col_idx) = matrix1(row_idx, col_idx) - val;
+	}
+	return &substract_matrix_real;
+}
+
+Matrix Matrix::dot_matrix_real(const Matrix& matrix1, const double val)
+{
+	Matrix dot_matrix_real = Matrix(matrix1._ncols, matrix1._nrows);
+	for (int row_idx = 0; row_idx < matrix1._nrows; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < matrix1._ncols; col_idx++)
+			dot_matrix_real(row_idx, col_idx) = matrix1(row_idx, col_idx) * val;
+	}
+	return &dot_matrix_real;
+}

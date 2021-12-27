@@ -48,10 +48,16 @@ public:
 	// Classic operators
 
 	// Set a value at an index place
+	void Matrix::set_value(const Matrix& matrix, int& i_ligne, int& j_col, double& val);
 	// Sum between two matrixes
+	Matrix Matrix::sum_matrix(const Matrix& matrix1, const Matrix& matrix2);
 	// Sum between a matrix and a real (left and right)
+	Matrix Matrix::sum_matrix_real(const Matrix& matrix1, const double val);
 	// Difference between two matrixes
+	Matrix Matrix::substract_matrix(const Matrix& matrix1, const Matrix& matrix2);
 	// 
 	// Difference between a matrix and a real (right)
+	Matrix Matrix::substract_matrix_real(const Matrix& matrix1, const double val);
 	// Product between a matrix and a real (right)
+	Matrix Matrix::dot_matrix_real(const Matrix& matrix1, const double val)
 };
