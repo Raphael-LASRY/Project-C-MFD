@@ -56,7 +56,6 @@ public:
 	void Matrix::operator+=(const doublle& val);
 	Matrix Matrix::operator+=(const Matrix& val) const;
 	//// Difference between a matrix and a real (right)
-	void Matrix::operator-=(const Matrix& matrix)
-	Matrix Matrix::operator-=(const Matrix& matrix) const
-	 
+	void Matrix::operator-=(const Matrix& matrix);
+	Matrix Matrix::operator-=(const Matrix& matrix) const;
 };
