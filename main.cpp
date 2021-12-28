@@ -10,7 +10,7 @@
 int main()
 {
 	Matrix A(3, 2, 0);
-	A(1, 1) = 2;
-	A.dot(A.transpose()).print_matrix();
+	Matrix B = 2 * identity(3) * 2;
+	cout << B << endl;
 	return 0;
 }

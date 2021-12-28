@@ -1,8 +1,4 @@
 #include "Matrix.h"
-#include <iostream>
-#include <assert.h>
-#include <stdlib.h> 
-using namespace std;
 
 //////////////////////////////////  Matrix //////////////////////////////////////////////
 
@@ -36,14 +32,6 @@ Matrix::Matrix(const Matrix& matrix)
 			row_vector.push_back(matrix._data[row_idx][col_idx]);
 		_data.push_back(row_vector);
 	}
-}
-
-Matrix Matrix::identity(int const size)
-{
-	Matrix I(size, size);
-	for (int row_idx = 0; row_idx < size; row_idx++)
-		I(row_idx, row_idx) = 1;
-	return I;
 }
 
 Matrix& Matrix::operator=(const Matrix& matrix)
@@ -92,54 +80,27 @@ Matrix Matrix::operator+(const double& lambda) const
 	return sum;
 }
 
+
+Matrix operator+(const double& lambda, const Matrix& matrix)
+{
+	return matrix + lambda;
+}
+
 void Matrix::operator+=(const Matrix& matrix)
 {   
 	assert(_nrows == matrix._nrows && _ncols == matrix._ncols);
 	for (int row_idx = 0; row_idx < _nrows; row_idx++)
 	{
 		for (int col_idx = 0; col_idx < _ncols; col_idx++)
-			_data[row_idx][col_idx] += matrix.data_[matrix._nrows, matrix._ncols];
+			_data[row_idx][col_idx] += matrix(row_idx, col_idx);
 	}
 }
 
-Matrix Matrix::operator+=(const Matrix& matrix) const
+Matrix Matrix::operator+(const Matrix& matrix) const
 {   
 	Matrix sum(*this);
 	sum += matrix;
 	return sum;
-}
-
-void Matrix::operator-=(const Matrix& matrix)
-{   
-	assert(_nrows == matrix._nrows && _ncols == matrix._ncols);
-	for (int row_idx = 0; row_idx < _nrows; row_idx++)
-	{
-		for (int col_idx = 0; col_idx < _ncols; col_idx++)
-			_data[row_idx][col_idx] -= matrix.data_[matrix._nrows, matrix._ncols];
-	}
-}
-
-Matrix Matrix::operator-=(const Matrix& matrix) const
-{   
-	Matrix diff(*this);
-	diff -= matrix;
-	return diff;
-}
-
-void Matrix::operator+=(const double& lambda)
-{
-	for (int row_idx = 0; row_idx < _nrows; row_idx++)
-	{
-		for(int col_idx = 0; col_idx < _ncols; col_idx++)
-			_data[row_idx][col_idx] += lambda;
-	}
-}
-
-Matrix Matrix::operator+(const double& lambda) const
-{
-	Matrix somme(*this);
-	somme += lambda;
-	return somme;
 }
 
 void Matrix::operator-=(const double& lambda)
@@ -158,6 +119,28 @@ Matrix Matrix::operator-(const double& lambda) const
 	return difference;
 }
 
+Matrix operator-(const double& lambda, const Matrix& matrix)
+{
+	return matrix - lambda;
+}
+
+void Matrix::operator-=(const Matrix& matrix)
+{
+	assert(_nrows == matrix._nrows && _ncols == matrix._ncols);
+	for (int row_idx = 0; row_idx < _nrows; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < _ncols; col_idx++)
+			_data[row_idx][col_idx] -= matrix(row_idx, col_idx);
+	}
+}
+
+Matrix Matrix::operator-(const Matrix& matrix) const
+{
+	Matrix difference(*this);
+	difference -= matrix;
+	return difference;
+}
+
 void Matrix::operator*=(const double& lambda)
 {
 	for (int row_idx = 0; row_idx < _nrows; row_idx++)
@@ -172,6 +155,11 @@ Matrix Matrix::operator*(const double& lambda) const
 	Matrix product(*this);
 	product *= lambda;
 	return product;
+}
+
+Matrix operator*(const double& lambda, const Matrix& matrix)
+{
+	return matrix * lambda;
 }
 
 void Matrix::operator*=(const Matrix& matrix)
@@ -221,15 +209,23 @@ Matrix Matrix::transpose() const
 	return transpose;
 }
 
-void Matrix::print_matrix() const
-{
-	for (int row_idx = 0; row_idx < _nrows; row_idx++)
+ostream& operator <<(ostream& str, const Matrix& matrix) {
+	for (int row_idx = 0; row_idx < matrix.nrows(); row_idx++)
 	{
-		std::cout << "| ";
-		for (int col_idx = 0; col_idx < _ncols; col_idx++)
-			std::cout << (*this)(row_idx, col_idx) << " ";
-		std::cout << "|\n";
+		for (int col_idx = 0; col_idx < matrix.ncols(); col_idx++)
+		{
+			str << matrix(row_idx, col_idx) << ' ';
+		}
+		str << endl;
 	}
-	std::cout << "\n\n";
+	return str;
 }
  
+
+Matrix identity(int const size)
+{
+	Matrix I(size, size);
+	for (int row_idx = 0; row_idx < size; row_idx++)
+		I(row_idx, row_idx) = 1;
+	return I;
+}
