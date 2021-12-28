@@ -50,11 +50,13 @@ public:
 	// Classic operators
 
 	//// Sum between two matrixes
-	//Matrix Matrix::sum_matrix(const Matrix& matrix1, const Matrix& matrix2);
+	void Matrix::operator+=(const Matrix& matrix);
+	Matrix Matrix::operator+=(const Matrix& matrix) const;
 	//// Sum between a matrix and a real (right)
-	//// 
+	void Matrix::operator+=(const doublle& val);
+	Matrix Matrix::operator+=(const Matrix& val) const;
 	//// Difference between a matrix and a real (right)
-	//Matrix Matrix::substract_matrix_real(const Matrix& matrix1, const double val);
-	//// Product between a matrix and a real (right)
-	//Matrix Matrix::dot_matrix_real(const Matrix& matrix1, const double val)
+	void Matrix::operator-=(const Matrix& matrix)
+	Matrix Matrix::operator-=(const Matrix& matrix) const
+	 
 };
