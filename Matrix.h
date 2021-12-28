@@ -16,13 +16,15 @@ public:
 	Matrix(const Matrix& matrix);
 	// Destructor
 	virtual ~Matrix() = default;
-	// Matrix identity
-	Matrix identity(int const size);
+	//// Matrix identity
+	//Matrix identity(int const size);
 
 	// Assignement operator
 	Matrix& operator=(const Matrix& matrix);
 	double operator()(const int& row_idx, const int& col_idx) const;
 	double& operator()(const int& row_idx, const int& col_idx);
+	void operator+=(const double& lambda);
+	Matrix operator+(const double& lambda) const;
 	void operator-=(const double& lambda);
 	Matrix operator-(const double& lambda) const;
 	void operator*=(const double& lambda);
@@ -31,7 +33,7 @@ public:
 	Matrix operator*(const Matrix& matrix) const;
 
 	// Functions
-	Matrix* transpose() const;
+	Matrix transpose() const;
 	void print_matrix() const;
 	Matrix dot(const Matrix& matrix) const;
 
@@ -47,17 +49,12 @@ public:
 
 	// Classic operators
 
-	// Set a value at an index place
-	void Matrix::set_value(const Matrix& matrix, int& i_ligne, int& j_col, double& val);
-	// Sum between two matrixes
-	Matrix Matrix::sum_matrix(const Matrix& matrix1, const Matrix& matrix2);
-	// Sum between a matrix and a real (left and right)
-	Matrix Matrix::sum_matrix_real(const Matrix& matrix1, const double val);
-	// Difference between two matrixes
-	Matrix Matrix::substract_matrix(const Matrix& matrix1, const Matrix& matrix2);
-	// 
-	// Difference between a matrix and a real (right)
-	Matrix Matrix::substract_matrix_real(const Matrix& matrix1, const double val);
-	// Product between a matrix and a real (right)
-	Matrix Matrix::dot_matrix_real(const Matrix& matrix1, const double val)
+	//// Sum between two matrixes
+	//Matrix Matrix::sum_matrix(const Matrix& matrix1, const Matrix& matrix2);
+	//// Sum between a matrix and a real (right)
+	//// 
+	//// Difference between a matrix and a real (right)
+	//Matrix Matrix::substract_matrix_real(const Matrix& matrix1, const double val);
+	//// Product between a matrix and a real (right)
+	//Matrix Matrix::dot_matrix_real(const Matrix& matrix1, const double val)
 };

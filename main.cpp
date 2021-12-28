@@ -10,6 +10,7 @@
 int main()
 {
 	Matrix A(3, 2, 0);
-	A.print_matrix();
+	A(1, 1) = 2;
+	A.dot(A.transpose()).print_matrix();
 	return 0;
 }
