@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cassert>
 #include <stdlib.h> 
+#include <iomanip> 
+
 using namespace std;
 
 class Matrix
@@ -65,7 +67,7 @@ public:
 };
 
 // Basic right operator surcharge
-Matrix operator+(const double& lambda, const Matrix &matrix);
+Matrix operator+(const double& lambda, const Matrix& matrix);
 Matrix operator-(const double& lambda, const Matrix& matrix);
 Matrix operator*(const double& lambda, const Matrix& matrix);
 

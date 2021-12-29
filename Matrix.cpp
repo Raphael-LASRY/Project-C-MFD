@@ -213,9 +213,7 @@ ostream& operator <<(ostream& str, const Matrix& matrix) {
 	for (int row_idx = 0; row_idx < matrix.nrows(); row_idx++)
 	{
 		for (int col_idx = 0; col_idx < matrix.ncols(); col_idx++)
-		{
-			str << matrix(row_idx, col_idx) << ' ';
-		}
+			str << setiosflags(ios::fixed) << setprecision(1) << scientific << matrix(row_idx, col_idx) << ' ';
 		str << endl;
 	}
 	return str;
