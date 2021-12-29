@@ -121,7 +121,7 @@ Matrix Matrix::operator-(const double& lambda) const
 
 Matrix operator-(const double& lambda, const Matrix& matrix)
 {
-	return matrix - lambda;
+	return (-1) * matrix + lambda;
 }
 
 void Matrix::operator-=(const Matrix& matrix)
