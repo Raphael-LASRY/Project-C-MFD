@@ -2,18 +2,37 @@
 #include "Matrix.h"
 
 
-void display_vector(const vector<double> v)
-{
+std::vector<double> linspace(double min_val, double max_val, int nb_disc) {
+	std::vector<double> res;
+	double step = (max_val - min_val) / nb_disc;
+	for (int i = 0 ; i <= nb_disc; i++) {
+		res.push_back(min_val + i * step);
+	}
+	return res;
+}
+
+int left_index(const double val, std::vector<double> vect) {     // Vect is assumed to be sorted
+	int res = -1;   // If val is lower than the lower bound of vect, we return -1
+	int length = vect.size(); 
+	for (int i = 0; i < length ; i++) {
+		if (val >= vect[i]) {
+			res = i; 
+		}
+	}
+	return res;
+}
+
+
+void display_vector(const std::vector<double> v) {
 	int n = v.size();
-	for (int i = 0; i < n; i++) 
-	{
+	for (int i = 0; i < n; i++) {
 		cout << v[i] << " ";
 	};
 	cout << endl; 
 }
 
 
-Matrix compute_cubic_spline_interpolation(const vector<double> strikes, const vector<double> implied_volatilities) 
+Matrix compute_cubic_spline_interpolation(const vector<double> strikes, const vector<double> implied_volatilities)
 {
 	int nb_rows = 4;
 	int nb_cols = strikes.size() - 1;
@@ -59,19 +78,18 @@ Matrix compute_cubic_spline_interpolation(const vector<double> strikes, const ve
 
 	// Gamma
 	for (int col_idx = 0; col_idx < nb_cols - 1; col_idx++)
-		M(2, col_idx) = (implied_volatilities[col_idx + 1] - implied_volatilities[col_idx]) / delta_strikes[col_idx] - 
-						M(0, col_idx) * delta_strikes[col_idx] * delta_strikes[col_idx] - 
-						M(1, col_idx) * delta_strikes[col_idx];
+		M(2, col_idx) = (implied_volatilities[col_idx + 1] - implied_volatilities[col_idx]) / delta_strikes[col_idx] -
+		M(0, col_idx) * delta_strikes[col_idx] * delta_strikes[col_idx] -
+		M(1, col_idx) * delta_strikes[col_idx];
 	return M;
 };
 
 
-double cubic_polynomial(const double& shift, vector<double> coeff, const double& x) 
-{
+double cubic_polynomial(const double& shift, std::vector<double> coeff, const double& x) {
 	double res = 0;
 	int size = coeff.size();
 	for (int i = 0; i < size; i++) {
-		res += coeff[i] * pow(x - shift, i);
+		res += coeff[i] * pow(x - shift, size-i-1);     // The first value of coeff is the highest order coefficient
 	};
 	return res;
 };
