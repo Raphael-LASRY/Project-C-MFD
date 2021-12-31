@@ -1,6 +1,16 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <vector>
+#include <iostream>
+#include <string>
+#include <cmath>
+#include <vector>
+#include <random>
+#include <fstream>
+#include <sstream>
+#include "math.h"
+#include "Matrix.h"
 #include <cassert>
 #include <stdlib.h> 
 #include <iomanip> 
@@ -64,6 +74,11 @@ public:
 	{
 		return _ncols;
 	}
+
+	std::vector<double> get_row(const int i);
+
+	std::vector<double> get_col(const int j);
+
 };
 
 // Basic right operator surcharge

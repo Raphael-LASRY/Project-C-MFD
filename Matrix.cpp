@@ -87,7 +87,7 @@ Matrix operator+(const double& lambda, const Matrix& matrix)
 }
 
 void Matrix::operator+=(const Matrix& matrix)
-{   
+{
 	assert(_nrows == matrix._nrows && _ncols == matrix._ncols);
 	for (int row_idx = 0; row_idx < _nrows; row_idx++)
 	{
@@ -97,7 +97,7 @@ void Matrix::operator+=(const Matrix& matrix)
 }
 
 Matrix Matrix::operator+(const Matrix& matrix) const
-{   
+{
 	Matrix sum(*this);
 	sum += matrix;
 	return sum;
@@ -107,7 +107,7 @@ void Matrix::operator-=(const double& lambda)
 {
 	for (int row_idx = 0; row_idx < _nrows; row_idx++)
 	{
-		for(int col_idx = 0; col_idx < _ncols; col_idx++)
+		for (int col_idx = 0; col_idx < _ncols; col_idx++)
 			_data[row_idx][col_idx] -= lambda;
 	}
 }
@@ -209,6 +209,25 @@ Matrix Matrix::transpose() const
 	return transpose;
 }
 
+std::vector<double> Matrix::get_row(const int i) {
+	assert(i < _nrows);
+	std::vector<double> res;
+	for (int j = 0; j < _ncols; j++) {
+		res.push_back((*this)(i, j));
+	}
+	return res;
+}
+
+std::vector<double> Matrix::get_col(const int j) {
+	assert(j < _ncols);
+	std::vector<double> res; 
+	for (int i = 0; i < _nrows; i++) {
+		res.push_back((*this)(i, j)); 
+	}
+	return res; 
+}
+
+
 ostream& operator <<(ostream& str, const Matrix& matrix) {
 	for (int row_idx = 0; row_idx < matrix.nrows(); row_idx++)
 	{
@@ -218,7 +237,7 @@ ostream& operator <<(ostream& str, const Matrix& matrix) {
 	}
 	return str;
 }
- 
+
 
 Matrix identity(int const size)
 {

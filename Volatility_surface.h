@@ -9,29 +9,29 @@ class Volatility_surface{
 
 public :
 
-	double RISK_FREE_RATE = 0.02;
+	double RISK_FREE_RATE = 0.05;
 
 	std::vector<double> maturities;
 	std::vector<double> strikes;
 	Matrix implied_volatility_bs;
 
 
-	int step_maturity;             // Number of points we want between two market maturities
-	int step_strike;               // Number of points we want between two market strikes
+	int nb_disc_maturity;             // Number of points of discretization for maturity
+	int nb_disc_strike;               // Number of points of discretization for strike
 
-	std::vector<std::vector<std::vector<double>>> polynomial_coefficients;
 
 	std::vector<double> discretize_maturities;
 	std::vector<double> discretize_strikes;
+
 	Matrix volatility_surface_discretize;    // Matrix of the volatility surface 
 
 
 	// Constructor with parameters 
 	Volatility_surface(const std::vector<double> maturities_input, const std::vector<double> strikes_input,
-		const Matrix implied_volatility, const int step_maturity_input, const int step_strike_input);
+		const Matrix implied_volatility, const std::vector<double> discretize_maturities_input, const std::vector<double> discretize_strikes_input);
 
 	// Constructor with a csv 
-	Volatility_surface(const std::string filename, const int step_maturity_input, const int step_strike_input);
+	Volatility_surface(const std::string filename, const std::vector<double> discretize_maturities_input, const std::vector<double> discretize_strikes_input);
 
 	// Destructor
 	virtual ~Volatility_surface() = default;

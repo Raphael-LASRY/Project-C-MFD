@@ -5,46 +5,25 @@
 
 
 Volatility_surface::Volatility_surface(const std::vector<double> maturities_input, const std::vector<double> strikes_input,
-	const Matrix implied_volatility_input, const int step_maturity_input, const int step_strike_input) {
+	const Matrix implied_volatility_input, const std::vector<double> discretize_maturities_input, const std::vector<double> discretize_strikes_input) {
 	maturities = maturities_input;
 	strikes = strikes_input;
 	implied_volatility_bs = implied_volatility_input;
 
-	step_maturity = step_maturity_input;
-	step_strike = step_strike_input;
 	
+	discretize_maturities = discretize_maturities_input;
+	discretize_strikes = discretize_strikes_input;
+
 	// Create the volatility surface matrix : 
+	int nb_disc_maturity = discretize_maturities.size();
+	int nb_disc_strike = discretize_strikes.size();
 
-	int nb_row = maturities.size() + step_strike * (maturities.size() - 1);
-	int nb_col = strikes.size() + step_strike * (strikes.size() - 1);
-	volatility_surface_discretize = Matrix(nb_row, nb_col, 0); 
-
-	// Create discretize maturities and strikes 
-	std::vector<double> disc_maturities, disc_strikes;
-	disc_maturities.push_back(maturities[0]);
-	disc_strikes.push_back(strikes[0]); 
-
-	for (int maturityIdx = 0; maturityIdx < maturities.size() - 1; maturityIdx++) {
-		double delta_maturity = (maturities[maturityIdx + 1] - maturities[maturityIdx]) / (step_maturity+1); 
-			for (int j = 0; j < step_maturity; j++) {
-				disc_maturities.push_back(maturities[maturityIdx] + (j + 1) * delta_maturity);
-		}
-			disc_maturities.push_back(maturities[maturityIdx + 1]);
-	}
-
-	for (int strikeIdx = 0; strikeIdx < strikes.size() - 1; strikeIdx++) {
-		double delta_strike = (strikes[strikeIdx + 1] - strikes[strikeIdx]) / (step_strike+1);
-		for (int j = 0; j < step_strike; j++) {
-			disc_strikes.push_back(strikes[strikeIdx] + (j + 1) * delta_strike);
-		}
-		disc_strikes.push_back(strikes[strikeIdx + 1]);
-	}
-	discretize_maturities = disc_maturities;
-	discretize_strikes = disc_strikes;
+	volatility_surface_discretize = Matrix(nb_disc_maturity, nb_disc_strike, 0); 
+	
 };
 
 
-Volatility_surface::Volatility_surface(const std::string filename, const int step_maturity_input, const int step_strike_input) {
+Volatility_surface::Volatility_surface(const std::string filename, const std::vector<double> discretize_maturities_input, const std::vector<double> discretize_strikes_input) {
 
 	std::vector<double> maturities_input;
 	std::vector<double> strikes_input;
@@ -116,46 +95,24 @@ Volatility_surface::Volatility_surface(const std::string filename, const int ste
 	maturities = maturities_input;
 	strikes = strikes_input; 
 
-	step_maturity = step_maturity_input;
-	step_strike = step_strike_input;
-
+	discretize_maturities = discretize_maturities_input;
+	discretize_strikes = discretize_strikes_input;
 
 	// Create the volatility surface matrix : 
+	int nb_disc_maturity = discretize_maturities.size();
+	int nb_disc_strike = discretize_strikes.size();
 
-	int nb_row = maturities.size() + step_strike * (maturities.size() - 1);
-	int nb_col = strikes.size() + step_strike * (strikes.size() - 1);
-
-	volatility_surface_discretize = Matrix(nb_row, nb_col, 0);
-
-	// Create discretize maturities and strikes 
-	std::vector<double> disc_maturities, disc_strikes;
-	disc_maturities.push_back(maturities[0]);
-	disc_strikes.push_back(strikes[0]);
-
-	for (int maturityIdx = 0; maturityIdx < maturities.size() - 1; maturityIdx++) {
-		double delta_maturity = (maturities[maturityIdx + 1] - maturities[maturityIdx]) / (step_maturity+1);
-		for (int j = 0; j < step_maturity; j++) {
-			disc_maturities.push_back(maturities[maturityIdx] + (j + 1) * delta_maturity);
-		}
-		disc_maturities.push_back(maturities[maturityIdx + 1]);
-	}
-
-	for (int strikeIdx = 0; strikeIdx < strikes.size() - 1; strikeIdx++) {
-		double delta_strike = (strikes[strikeIdx + 1] - strikes[strikeIdx]) / (step_strike+1);
-		for (int j = 0; j < step_strike; j++) {
-			disc_strikes.push_back(strikes[strikeIdx] + (j + 1) * delta_strike);
-		}
-		disc_strikes.push_back(strikes[strikeIdx + 1]);
-	}
-	discretize_maturities = disc_maturities;
-	discretize_strikes = disc_strikes;
-
+	volatility_surface_discretize = Matrix(nb_disc_maturity, nb_disc_strike, 0);
 };
 
 
 
 void Volatility_surface::partial_fill_volatility_surface(const int idx1, const int idx2) {
 	// Get Matrix rows at Idx1 and Idx2 : 
+
+	double maturity_1 = maturities[idx1];
+	double maturity_2 = maturities[idx2];
+
 	std::vector<double> implied_vol_1, implied_vol_2; 
 	for (int colIdx = 0; colIdx < strikes.size(); colIdx++) {
 		implied_vol_1.push_back(implied_volatility_bs(idx1, colIdx));
@@ -164,37 +121,67 @@ void Volatility_surface::partial_fill_volatility_surface(const int idx1, const i
 	Matrix coeff1 = compute_cubic_spline_interpolation(strikes, implied_vol_1);
 	Matrix coeff2 = compute_cubic_spline_interpolation(strikes, implied_vol_2); 
 
-	int disc_vol_rowIdx;
+	// We determine all indexes of discretize_maturities corresponding of maturities between T1 and T2 : 
+	std::vector<int> maturity_indexes; 
+	for (int i = 0; i < discretize_maturities.size(); i++) {
+		if (discretize_maturities[i] >= maturity_1 and discretize_maturities[i] <= maturity_2)
+			maturity_indexes.push_back(i);
+	}
+	for (int i = 0; i < maturity_indexes.size(); i++) {
+		int maturityIdx = maturity_indexes[i];
+		double maturity = discretize_maturities[maturityIdx]; 
+		for (int j = 0; j < discretize_strikes.size(); j++) {
+			double strike = discretize_strikes[j]; 
+			double K_1 = strike * exp((maturity - maturity_1) * RISK_FREE_RATE);
+			double K_2 = strike * exp((maturity_2 - maturity) * RISK_FREE_RATE);
 
-	// We first fill the rows corresponding to maturities T1 and T2 : 
+			int left_index_1 = left_index(K_1, strikes); 
+			int left_index_2 = left_index(K_2, strikes);
 
-	disc_vol_rowIdx = idx1 * (step_maturity+1) ;
+			double sigma_1; 
+			double sigma_2;
 
-	for (int strikeIdx = 0; strikeIdx < strikes.size() - 1; strikeIdx++) {
+			int strikes_length = strikes.size(); 
 
-		int disc_strikeIdx = strikeIdx * (step_strike + 1); 
+			if (left_index_1 == -1) {
+				std::vector<double> coeff = coeff1.get_col(0); 
+				double D_L = coeff[2]; 
+				sigma_1 = implied_volatility_bs(idx1, 0) + D_L * (strike - strikes[0]);
+			}
+			else if (left_index_1 == (strikes_length - 1)) {
+				std::vector<double> coeff = coeff1.get_col(strikes_length - 2);
+				double delta_strikes = strikes[strikes_length - 1] - strikes[strikes_length - 2];
+				double D_R = 3 * coeff[0] * pow(delta_strikes, 2) + 2 * coeff[1] * delta_strikes + coeff[2] ;
+				sigma_1 = implied_volatility_bs(idx1, strikes_length - 1) + D_R * (strike - strikes[strikes_length - 1]);
+			}
+			else {
+				std::vector<double> coeff = coeff1.get_col(left_index_1); 
+				double left_strike = strikes[left_index_1]; 
+				sigma_1 = cubic_polynomial(left_strike, coeff, strike); 
+			}
 
-		double lower_strike_vol = implied_vol_1[strikeIdx]; 
-		double upper_strike_vol = implied_vol_1[strikeIdx + 1];
-		volatility_surface_discretize(disc_vol_rowIdx, strikeIdx * (step_strike+1)) = lower_strike_vol;
-		volatility_surface_discretize(disc_vol_rowIdx, (strikeIdx+1) * (step_strike+1)) = upper_strike_vol;
-
-		std::vector<double> coeff;
-		for (int i = 0; i < 4;i++) {
-			coeff.push_back(coeff1(i, strikeIdx));
-		}
-		for (int j = 0; j < step_strike;j++) {
-			volatility_surface_discretize(disc_vol_rowIdx, disc_strikeIdx + j + 1) = cubic_polynomial(strikes[strikeIdx], coeff, discretize_strikes[disc_strikeIdx + j + 1]);
+			if (left_index_2 == -1) {
+				std::vector<double> coeff = coeff2.get_col(0);
+				double D_L = coeff[2];
+				sigma_2 = implied_volatility_bs(idx2, 0) + D_L * (strike - strikes[0]);
+			}
+			else if (left_index_2 == (strikes_length - 1)) {
+				std::vector<double> coeff = coeff2.get_col(strikes_length - 2);
+				double delta_strikes = strikes[strikes_length - 1] - strikes[strikes_length - 2];
+				double D_R = 3 * coeff[0] * pow(delta_strikes, 2) + 2 * coeff[1] * delta_strikes + coeff[2];
+				sigma_2 = implied_volatility_bs(idx2, strikes_length - 1) + D_R * (strike - strikes[strikes_length - 1]);
+			}
+			else {
+				std::vector<double> coeff = coeff2.get_col(left_index_2);
+				double left_strike = strikes[left_index_2];
+				sigma_2 = cubic_polynomial(left_strike, coeff, strike);
+			}
+			double delta_square = ((pow(sigma_2, 2) * maturity_2 - pow(sigma_1, 2) * maturity_1) / (maturity_2 - maturity_1));
+			volatility_surface_discretize(maturityIdx, j) = sqrt((1 / maturity) * (pow(sigma_1, 2) * maturity_1 + delta_square * (maturity - maturity_1))); 
 		}
 	}
-	
-	// Now we fill maturities between T1 and T2
-	for (int maturityIdx = 0; maturityIdx < step_maturity; maturityIdx++) {
-
-	}
-
-
 };
+
 
 void Volatility_surface::fill_volatility_surface() {
 	int nb_maturities = maturities.size(); 
