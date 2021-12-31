@@ -6,51 +6,22 @@
 #include <fstream>
 #include <sstream>
 #include "math.h"
-#include "Matrix.h"
+#include "matrix.h"
+#include "volatility_surface.h"
+#include "utils.h"
 
 int main()
 {
 	string filename = "Implied_Volatilities_Example.csv";
-	Matrix SIGMA(9, 10);
 
-	ifstream input{ filename };
+	std::vector<double> discretize_maturities = arange(0.05, 6, 0.05);
+	std::vector<double> discretize_strikes = arange(10, 200, 10);
 
-	if (!input.is_open()) 
-	{
-		cerr << "Couldn't read file: " << filename << "\n";
-		return 1;
-	}
+	Volatility_surface vol_surface(filename, discretize_maturities, discretize_strikes);
 
-	vector<vector<string>> csvRows;
+	vol_surface.fill_volatility_surface();
 
-	for (string line; getline(input, line);) 
-	{
-		istringstream ss(move(line));
-		vector<string> row;
-		if (!csvRows.empty()) 
-		// We expect each row to be as big as the first row
-			row.reserve(csvRows.front().size());
-		// std::getline can split on other characters, here we use ','
-		for (string value; getline(ss, value, ',');)
-			row.push_back(move(value));
-		csvRows.push_back(std::move(row));
-	}
-
-	// Store our matrix
-	int row_idx = 0;
-	int col_idx = 0;
-	for (const vector<string>& row : csvRows) 
-	{
-		col_idx = 0;
-		for (const string& value : row)
-		{
-			SIGMA(row_idx, col_idx) = stod(value);
-			col_idx++;
-		}
-		row_idx++;
-	}
-
-	cout << SIGMA << endl;
-
+	cout << vol_surface._volatility_surface_discretize << endl;
+	export_volatility_surface_discretize("Results.csv", vol_surface._volatility_surface_discretize, discretize_maturities, discretize_strikes);
 	return 0;
 }
