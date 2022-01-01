@@ -26,7 +26,7 @@ int left_index(const double& val, const vector<double>& vect) // Vect is assumed
 	int length = vect.size();
 	for (int idx = 0; idx < length; idx++)
 	{
-		if (val < vect[idx])
+		if (val <= vect[idx])
 			return idx;
 		res = idx;
 	}
