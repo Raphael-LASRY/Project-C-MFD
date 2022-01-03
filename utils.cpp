@@ -109,13 +109,16 @@ void export_volatility_surface_discretize(const string& filename, const Matrix& 
 	file.open(filename);
 	int n_rows = discretize_maturities.size();
 	int n_cols = discretize_strikes.size();
-	file << "Maturities / Strikes;";
+	for (int col_idx = 0; col_idx < n_cols; col_idx++)
+		file << ";";
+	file << ";" << "\n";
+	file << ";Maturities / Strikes;";
 	for (int col_idx = 0; col_idx < n_cols; col_idx++)
 		file << discretize_strikes[col_idx] << ";";
 	file << "\n";
 	for (int row_idx = 0; row_idx < n_rows; row_idx++)
 	{
-		file << discretize_maturities[row_idx] << ";";
+		file << ";" << discretize_maturities[row_idx] << ";";
 		for (int col_idx = 0; col_idx < n_cols; col_idx++)
 		{
 			file << volatility_surface_discretize(row_idx, col_idx) << ";";
